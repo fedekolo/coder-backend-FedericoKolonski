@@ -1,14 +1,15 @@
 const recorrerTexto = (texto,tiempo,cb) => {
     let palabras = texto.split(' ');
-    let duracion = tiempo ?? 1000
-    for (let i = 0; i < palabras.length; i++) {  
-        setInterval(
-            () => {
-                console.log(palabras[i]);
-            }, duracion
-        )
-        cb(palabras);
-    }
+    let duracion = tiempo ?? 1000;
+    let i = 0;
+    let intervalo = setInterval(
+        () => {console.log(palabras[i++])
+        if (palabras.length == i) {
+            clearInterval(intervalo)
+            cb(palabras);
+        }
+    }, duracion
+    )
 }
 
 const final = (palabras) => console.log('Proceso terminado',palabras.length)
