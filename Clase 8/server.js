@@ -1,5 +1,4 @@
 const express = require('express');
-const fs = require('fs');
 
 const app = express();
 const PORT = 8080;
@@ -12,36 +11,47 @@ class Archivo {
         this.archivo = archivo;
     }
 
-    async listar() {
-        const archivo = await fs.promises.readFile('./productos.txt','utf-8');
-        const archivoObj = JSON.parse(archivo);
-        return archivoObj==[] ? {error: 'No hay productos cargados'} : archivoObj;
+    listar() {
+        return this.archivo==[] ? {error: 'No hay productos cargados'} : this.archivo;
     }
 
-    async listarId(id) {
-        const archivo = await fs.promises.readFile('./productos.txt','utf-8');
-        const archivoObj = JSON.parse(archivo);
-        const productoFiltrado = archivoObj.find(producto => producto.id==id);
+    listarId(id) {
+        const productoFiltrado = this.archivo.find(producto => producto.id==id);
         return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado;
     }
 
-    async guardar(productoBody) {
-        const archivo = await fs.promises.readFile('./productos.txt','utf-8');
-        const archivoObj = JSON.parse(archivo);
+    guardar(productoBody) {
         const productoParaAgregar = {
             title: productoBody.title,
             price: productoBody.price,
             thumbnail: productoBody.thumbnail,
-            id: archivoObj.length+1
+            id: this.archivo.length+1
         }
-        archivoObj.push(productoParaAgregar);
-        const archivoActualizado = JSON.stringify(archivoObj, null, '\t');
-        await fs.promises.writeFile('./productos.txt',archivoActualizado);
+        this.archivo.push(productoParaAgregar);
         return productoParaAgregar;
     }
 }
 
-let archivo1 = new Archivo('productos.txt');
+let archivo1 = new Archivo([
+    {
+		"title": "Escuadra",
+		"price": 123.45,
+		"thumbnail": "https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-256.png",
+		"id": 1
+	},
+	{
+		"title": "Calculadora",
+		"price": 234.56,
+		"thumbnail": "https://cdn3.iconfinder.com/data/icons/education-209/64/calculator-math-tool-school-256.png",
+		"id": 2
+	},
+	{
+		"title": "Globo Terráqueo",
+		"price": 345.67,
+		"thumbnail": "https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png",
+		"id": 3
+	}
+]);
 
 app.get('/api/productos/listar', async (req,res) => {
     try {
