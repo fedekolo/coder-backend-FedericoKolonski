@@ -99,7 +99,7 @@ let bd = new Archivo([
 routerApi.get('/productos/vista', async (req,res) => {
     try {
         const archivo = await bd.listar();
-        const sinProductos = archivo==[] ? true : false; // No interpreta cuando llega el array vacio
+        const sinProductos = archivo.length==0 ? true : false;
         res.render('index',{producto: archivo,sinProductos: sinProductos});
     } catch (err) {
         console.log(err);
