@@ -1,0 +1,44 @@
+html
+    head
+        title="Vistas"
+        link(
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
+            crossorigin="anonymous"
+        )
+    body
+        h1(
+            style="text-align: center; margin-top: 20px;"
+        ) Productos
+        table(
+            class="table table-striped table-hover"
+            style="width: 80%; margin: auto; text-align:center;"
+        )
+            thead
+                tr
+                    th(
+                        scope="col"
+                    ) Nombre
+                    th(
+                        scope="col"
+                    ) Precio
+                    th(
+                        scope="col"
+                    ) Foto
+            tbody
+                if sinProductos
+                    tr
+                        td
+                        td
+                            h3 No hay productos para mostrar
+                        td
+                else 
+                    each val in producto 
+                        tr
+                            td= val.title
+                            td= '$' + val.price 
+                            td
+                                img(
+                                    src= val.thumbnail
+                                    alt= val.title 
+                                    style= "height: 30px;"
+                                )

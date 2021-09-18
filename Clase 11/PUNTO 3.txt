@@ -1,0 +1,1 @@
+Mi elección es HANDLEBARS. Su manejo de las vistas y su simplicidad para poner JS en las plantillas me pareció bastante bueno. Pug también me gustó pero no me termino de adaptar a su manera de escribir el HTML. 
