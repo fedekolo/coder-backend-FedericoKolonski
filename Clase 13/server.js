@@ -67,7 +67,7 @@ class Archivo {
         const mensajeParaAgregar = {
             mail: data.mail,
             mensaje: data.mensaje,
-            fechaHora: moment().format('DD/MM/YYYY h:mm:ss a')
+            fechaHora: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a')
         }
         archivoObj.push(mensajeParaAgregar);
         const archivoActualizado = JSON.stringify(archivoObj, null, '\t');
