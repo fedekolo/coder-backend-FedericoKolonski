@@ -1,6 +1,8 @@
+// CONFIG INICIAL
 const fs = require('fs');
 const moment = require('moment');
 
+// FUNCIONES
 class Productos {
     constructor (bd) {
         this.bd = bd;
@@ -35,6 +37,18 @@ class Productos {
         productosObj.push(productoParaAgregar);
         const productosActualizado = JSON.stringify(productosObj, null, '\t');
         await fs.promises.writeFile(this.bd,productosActualizado);
+        return;
+    }
+
+    async agregarAlCarrito(id) {
+        const productos = await fs.promises.readFile(this.bd,'utf-8');
+        const productosObj = JSON.parse(productos);
+        const carrito = await fs.promises.readFile('./bd/carrito.txt','utf-8');
+        const carritoObj = JSON.parse(carrito);
+        const productoParaAgregar = productosObj.find(producto => producto.id==id);
+        carritoObj.push(productoParaAgregar);
+        const carritoActualizado = JSON.stringify(carritoObj, null, '\t');
+        await fs.promises.writeFile('./bd/carrito.txt',carritoActualizado);
         return;
     }
 
