@@ -1,0 +1,24 @@
+[
+	{
+		"title": "Calculadora",
+		"price": 234.56,
+		"thumbnail": "https://cdn3.iconfinder.com/data/icons/education-209/64/calculator-math-tool-school-256.png",
+		"id": 2
+	},
+	{
+		"title": "Globo Terráqueo",
+		"price": 345.67,
+		"thumbnail": "https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png",
+		"id": 3
+	},
+	{
+		"id": 4,
+		"timestamp": "02/10/2021 8:13:56 pm",
+		"nombre": "Coca cola",
+		"descripcion": "Sabrosa y dulce",
+		"codigo": "5547",
+		"foto": "https://carrefourar.vtexassets.com/arquivos/ids/191443/7790895000997_02.jpg",
+		"precio": "120",
+		"stock": "153"
+	}
+]
