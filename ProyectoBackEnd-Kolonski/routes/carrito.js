@@ -13,7 +13,7 @@ router.get('/listar', async (req,res) => {
         const productos = await controller.listar();
         res.json(productos);
     } catch (err) {
-        console.log(err);
+        res.send('Ha habido un error:', err);
     }
 });
 
@@ -23,7 +23,7 @@ router.get('/listar/:id', async (req,res) => {
         const producto = await controller.listarId(params.id);
         res.json(producto);
     } catch (err) {
-        console.log(err);
+        res.send('Ha habido un error:', err);
     }
 });
 
@@ -34,7 +34,7 @@ router.post('/agregar/:id', async (req,res) => {
             res.send('Producto agregado al carrito con éxito');
         }
         catch (err) {
-            console.log(err);
+            res.send('Ha habido un error:', err);
         }
 });
 
@@ -45,7 +45,7 @@ router.delete('/borrar/:id', async (req,res) => {
             res.send('Producto eliminado con éxito');
         }
         catch (err) {
-            console.log(err);
+            res.send('Ha habido un error:', err);
         }
 });
 

@@ -13,7 +13,7 @@ router.get('/listar', async (req,res) => {
         const productos = await controller.listar();
         res.json(productos);
     } catch (err) {
-        console.log(err);
+        res.send('Ha habido un error:', err);
     }
 });
 
@@ -23,7 +23,7 @@ router.get('/listar/:id', async (req,res) => {
         const producto = await controller.listarId(params.id);
         res.json(producto);
     } catch (err) {
-        console.log(err);
+        res.send('Ha habido un error:', err);
     }
 });
 
@@ -35,7 +35,7 @@ router.post('/agregar', async (req,res) => {
             res.send('Producto agregado con éxito');
         }
         catch (err) {
-            console.log(err);
+            res.send('Ha habido un error:', err);
         }
     } else {
         res.send('No puede ingresar a esta página');
@@ -51,7 +51,7 @@ router.put('/actualizar/:id', async (req,res) => {
             await controller.actualizar(params.id,productoBody);
             res.send('Producto actualizado con éxito');
         } catch (err) {
-            console.log(err);
+            res.send('Ha habido un error:', err);
         }
     } else {
         res.send('No puede ingresar a esta página');
@@ -67,7 +67,7 @@ router.delete('/borrar/:id', async (req,res) => {
             res.send('Producto eliminado con éxito');
         }
         catch (err) {
-            console.log(err);
+            res.send('Ha habido un error:', err);
         }
     } else {
         res.send('No puede ingresar a esta página');
