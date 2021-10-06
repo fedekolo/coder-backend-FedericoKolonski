@@ -8,15 +8,5 @@
 		"foto": "https://carrefourar.vtexassets.com/arquivos/ids/191443/7790895000997_02.jpg",
 		"precio": "120",
 		"stock": "153"
-	},
-	{
-		"id": 3,
-		"timestamp": "03/10/2021 8:28:22 pm",
-		"nombre": "Crema",
-		"descripcion": "Suave",
-		"codigo": "43141",
-		"foto": "https://www.instyle.es/medio/2020/04/16/nivea-body-milk-nutritivo-48-horas_747eb543_600x600.jpg",
-		"precio": "420",
-		"stock": "53"
 	}
 ]
