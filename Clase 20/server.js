@@ -5,7 +5,6 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const moment = require('moment');
-const mongoose = require('mongoose');
 const Producto = require('./models/productos');
 const Mensaje = require('./models/mensajes');
 const conexionDB = require('./db/conexionDB');
@@ -34,15 +33,15 @@ class Archivo {
     }
 
     async guardar(productoBody) {
-        const productoParaAgregar = [{
+        const productoParaAgregar = {
             title: productoBody.title,
             price: parseInt(productoBody.price),
             thumbnail: productoBody.thumbnail,
             id: this.archivo.length+1
-        }];
+        };
 
         try {
-            await Producto.insert(productoParaAgregar);
+            await Producto(productoParaAgregar).save();
         }
     
         catch(e) {
@@ -50,62 +49,52 @@ class Archivo {
         }
     }
 
-    // actualizar(id,productoBody) {      
-    //     const productoActualizado = {
-    //         title: productoBody.title,
-    //         price: productoBody.price,
-    //         thumbnail: productoBody.thumbnail,
-    //         id: id
-    //     };
+    async actualizar(id,productoBody) {      
+        const productoActualizado = {
+            title: productoBody.title,
+            price: productoBody.price,
+            thumbnail: productoBody.thumbnail,
+            id: id
+        };
+        try {
+            await Producto.updateOne({id: id}, {$set: productoActualizado});
+            return productoActualizado;
+        }
+    
+        catch(e) {
+            console.log('Error en proceso:', e);
+        }
+    }
 
-    //     (async () => {
-    //         try {
-    //             await knexMariaDB('productos').select('*').where('id', '=', id).update(productoActualizado);
-    //             return productoActualizado;
-    //         }
-        
-    //         catch(e) {
-    //             console.log('Error en proceso:', e);
-    //             knex.destroy();
-    //         }
-    //     })();
-    // }
+    async borrar(id) {
+        try {
+            await Producto.deleteOne({id: id});
+        }
+    
+        catch(e) {
+            console.log('Error en proceso:', e);
+        }
 
-    // borrar(id) {
-    //     (async () => {
-    //         try {
-    //             await knexMariaDB('productos').where('id', '=', id).del();
-    //         }
-        
-    //         catch(e) {
-    //             console.log('Error en proceso:', e);
-    //             knex.destroy();
-    //         }
-    //     })();
+        const productoEliminado = this.archivo.filter(producto => producto.id==id);
+        this.archivo = this.archivo.filter(producto => producto.id!=id);
+        return productoEliminado;
+    }
 
-    //     const productoEliminado = this.archivo.filter(producto => producto.id==id);
-    //     this.archivo = this.archivo.filter(producto => producto.id!=id);
-    //     return productoEliminado;
-    // }
+    async guardarMensaje(data) {
+        const mensajeParaAgregar = {
+            mail: data.mail,
+            mensaje: data.mensaje,
+            fechaHora: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a')
+        };
 
-    // async guardarMensaje(data) {
-    //     const mensajeParaAgregar = [{
-    //         mail: data.mail,
-    //         mensaje: data.mensaje,
-    //         fechaHora: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a')
-    //     }];
-
-    //     (async () => {
-    //         try {
-    //             await knex('mensajes').insert(mensajeParaAgregar);
-    //         }
-        
-    //         catch(e) {
-    //             console.log('Error en proceso:', e);
-    //             knex.destroy();
-    //         }
-    //     })();
-    // }
+        try {
+            await Mensaje(mensajeParaAgregar).save();
+        }
+    
+        catch(e) {
+            console.log('Error en proceso:', e);
+        }
+    }
 }
 
 // CONFIG HANDLEBARS
@@ -122,31 +111,28 @@ app.set('views', './views');
 app.set('view engine', 'hbs');
 
 // SOCKET
-// io.on('connection', async (socket) => {
-//     // Refrescar productos
-//     socket.on('refrescar',(data) => {
-//         io.sockets.emit('productoNuevo',data);
-//     });
+io.on('connection', async (socket) => {
+    // Refrescar productos
+    socket.on('refrescar',(data) => {
+        io.sockets.emit('productoNuevo',data);
+    });
 
-//     // Chat de usuarios
-//     (async () => {
-//         try {
-//             const mensajes = await knex.from('mensajes').select('*');
-//             io.sockets.emit('mensajes', mensajes);
-//             socket.on('nuevo', async (data) => {
-//                 const bdMensajes = new Archivo(mensajes);
-//                 await bdMensajes.guardarMensaje(data);
-//                 io.sockets.emit('mensajes',mensajes);
-//             });
-//             // knex.destroy();
-//         }
+    // Chat de usuarios
+        try {
+            const mensajes = await Mensaje.find().lean();
+            io.sockets.emit('mensajes', mensajes);
+            socket.on('nuevo', async (data) => {
+                const bdMensajes = await Producto.find().lean();
+                const bd = new Archivo(bdMensajes);
+                await bd.guardarMensaje(data);
+                io.sockets.emit('mensajes',mensajes);
+            });
+        }
     
-//         catch(e) {
-//             console.log('Error en proceso:', e);
-//             knex.destroy();
-//         }
-//     })();
-// })
+        catch(e) {
+            console.log('Error en proceso:', e);
+        }
+})
 
 // RUTAS
 router.get('/',(req,res) => {
@@ -161,7 +147,6 @@ routerApi.get('/productos/agregar', async (req,res) => {
         const archivo = await bd.listar();
         const sinProductos = archivo.length==0 ? true : false;
         res.render('add',{producto: archivo,sinProductos: sinProductos});
-        await mongoose.connection.close();
     } catch (err) {
         console.log(err);
     }
@@ -175,35 +160,36 @@ routerApi.post('/productos/guardar', async (req,res) => {
         const bd = new Archivo(bdProductos);
         await bd.guardar(productoBody);
         res.redirect('/api/productos/agregar');
-        await mongoose.connection.close();
     }
     catch (err) {
         console.log(err);
     }
 });
 
-// routerApi.put('/productos/actualizar/:id', async (req,res) => {
-//     try {
-//         const params = req.params;
-//         const productoBody = req.body;
-//         const bdProductos = await knexMariaDB.from('productos').select('*');
-//         const bd = new Archivo(bdProductos);
-//         const archivo = await bd.actualizar(params.id,productoBody);
-//         res.json(archivo);
-//     } catch (err) {
-//         console.log(err);
-//     }
-// });
+routerApi.put('/productos/actualizar/:id', async (req,res) => {
+    try {
+        conexionDB();
+        const params = req.params;
+        const productoBody = req.body;
+        const bdProductos = await Producto.find().lean();
+        const bd = new Archivo(bdProductos);
+        const archivo = await bd.actualizar(params.id,productoBody);
+        res.json(archivo);
+    } catch (err) {
+        console.log(err);
+    }
+});
 
-// routerApi.delete('/productos/borrar/:id', async (req,res) => {
-//     try {
-//         const params = req.params;
-//         const bdProductos = await knexMariaDB.from('productos').select('*');
-//         const bd = new Archivo(bdProductos);
-//         const archivo = await bd.borrar(params.id);
-//         res.json(archivo);
-//     }
-//     catch (err) {
-//         console.log(err);
-//     }
-// });
+routerApi.delete('/productos/borrar/:id', async (req,res) => {
+    try {
+        conexionDB();
+        const params = req.params;
+        const bdProductos = await Producto.find().lean();
+        const bd = new Archivo(bdProductos);
+        const archivo = await bd.borrar(params.id);
+        res.json(archivo);
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
