@@ -14,8 +14,10 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static('./public'));
 
 // ENRUTADOR
-app.use('/productos',require('./routes/productos'));
-app.use('/carrito',require('./routes/carrito'));
+const routerProductos = require('./routes/productos');
+app.use('/productos',routerProductos.router);
+const routerCarrito = require('./routes/carrito');
+app.use('/carrito',routerCarrito.router);
 
 // CONFIG ADMIN 
 const isAdmin = true; //determina si el usuario que ingresa es admin o no
