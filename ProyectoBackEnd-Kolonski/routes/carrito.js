@@ -3,9 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 3; 
-// const Carrito = require('../controller/fs/carrito');
-// const controller = new Carrito('./bd/fs/carrito.txt');
+const bdSeleccionada = 4; 
 
 const bdConfig = async (bdSeleccionada) => {
     
@@ -80,14 +78,26 @@ const bdConfig = async (bdSeleccionada) => {
         const Carrito = require('../controller/SQlite3/carrito');
         const bdCarrito = await knexSQlite3.from('carrito').select('*');
         return new Carrito(bdCarrito);
+
     } else if (bdSeleccionada === 3) {
         // MONGODB
 
         const conexionMongoDB = require('../bd/mongoDB/conexionDB');
         conexionMongoDB();
-        const Carrito = await require('../controller/mongoDB/carrito');
+        const Carrito = require('../controller/mongoDB/carrito');
         const ProductoCarrito = require('../bd/mongoDB/models/carrito');
         const bdProductos = await ProductoCarrito.find().lean();
+        return new Carrito(bdProductos);
+
+    } else if (bdSeleccionada === 4) {
+        // FIREBASE
+
+        const admin = require("firebase-admin");
+        const conexionFirebase = require('../bd/firebase/firebase');
+        conexionFirebase();
+        const Carrito = require('../controller/firebase/carrito');
+        const firestore = admin.firestore();
+        const bdProductos = await firestore.collection('carrito');
         return new Carrito(bdProductos);
     }
 

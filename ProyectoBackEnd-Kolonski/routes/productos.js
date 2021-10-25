@@ -5,8 +5,6 @@ const server = require('../server');
 
 // CONEXION CON BD FACTORY
 const bdSeleccionada = 3; 
-// const Carrito = require('../controller/fs/carrito');
-// const controller = new Carrito('./bd/fs/carrito.txt');
 
 const bdConfig = async (bdSeleccionada) => {
     
