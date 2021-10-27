@@ -22,14 +22,14 @@ class Productos {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }
 
-    guardar(productoBody) {
+    agregar(productoBody) {
         const productoParaAgregar = [{
-            id: this.bd.length+1,
+            id: Math.round(Math.random() * (1000000 - 1) + 1),
             timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
             nombre: productoBody.nombre,
             descripcion: productoBody.descripcion,
@@ -47,7 +47,7 @@ class Productos {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }
@@ -68,7 +68,7 @@ class Productos {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }
@@ -82,7 +82,7 @@ class Productos {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }

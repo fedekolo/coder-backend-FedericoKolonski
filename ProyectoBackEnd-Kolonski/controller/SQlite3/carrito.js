@@ -22,7 +22,7 @@ class Carrito {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }
@@ -38,7 +38,7 @@ class Carrito {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }
@@ -52,7 +52,7 @@ class Carrito {
         
             catch(e) {
                 console.log('Error en proceso:', e);
-                knex.destroy();
+                knexSQlite3.destroy();
             }
         })();
     }

@@ -4,15 +4,15 @@ const router = express.Router();
 const server = require('../server'); 
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 3; 
+const bdSeleccionada = 4; 
 
 const bdConfig = async (bdSeleccionada) => {
     
     if (bdSeleccionada === 0) {
         // FILE SYSTEM
 
-        const Productos = require('../controller/fs/productos');
-        return new Productos('../bd/fs/productos.txt');
+        const bdProductos = '../controller/fs/productos';
+        return bdProductos;
 
     } else if (bdSeleccionada === 1) {
         // MARIA DB
@@ -25,11 +25,11 @@ const bdConfig = async (bdSeleccionada) => {
                 await knexMariaDB.schema.hasTable('productos').then((exists) => {
                     if (!exists) {
                       return knexMariaDB.schema.createTable('productos', (table) => {
-                        table.string('title'),
-                        table.string('description'),
+                        table.string('nombre'),
+                        table.string('descripcion'),
                         table.integer('codigo'),
-                        table.integer('price'),
-                        table.string('thumbnail'),
+                        table.integer('precio'),
+                        table.string('foto'),
                         table.integer('stock'),
                         table.integer('id')
                       });
@@ -42,9 +42,8 @@ const bdConfig = async (bdSeleccionada) => {
                 knexMariaDB.destroy();
             }
         })();
-        const Productos = await require('../controller/mariaDB/productos');
         const bdProductos = await knexMariaDB.from('productos').select('*');
-        return new Productos(bdProductos);
+        return bdProductos;
     } else if (bdSeleccionada === 2) {
         // SQLITE3
 
@@ -56,13 +55,13 @@ const bdConfig = async (bdSeleccionada) => {
                 await knexSQlite3.schema.hasTable('productos').then((exists) => {
                     if (!exists) {
                         return knexSQlite3.schema.createTable('productos', (table) => {
-                        table.string('title'),
-                        table.string('description'),
-                        table.integer('codigo'),
-                        table.integer('price'),
-                        table.string('thumbnail'),
-                        table.integer('stock'),
-                        table.integer('id')
+                            table.string('nombre'),
+                            table.string('descripcion'),
+                            table.integer('codigo'),
+                            table.integer('precio'),
+                            table.string('foto'),
+                            table.integer('stock'),
+                            table.integer('id')
                         });
                     }
                     });
@@ -73,29 +72,71 @@ const bdConfig = async (bdSeleccionada) => {
                 knexSQlite3.destroy();
             }
         })();
-        const Productos = await require('../controller/SQlite3/productos');
         const bdProductos = await knexSQlite3.from('productos').select('*');
-        return new Productos(bdProductos);
+        return bdProductos;
     } else if (bdSeleccionada === 3) {
         // MONGODB
 
         const conexionMongoDB = require('../bd/mongoDB/conexionDB');
         conexionMongoDB();
-        const Productos = await require('../controller/mongoDB/productos');
         const Producto = require('../bd/mongoDB/models/productos');
         const bdProductos = await Producto.find().lean();
-        return new Productos(bdProductos);
+        return bdProductos;
+    } else if (bdSeleccionada === 4) {
+        // FIREBASE
+
+        const admin = require("firebase-admin");
+        const conexionFirebase = require('../bd/firebase/firebase');
+        conexionFirebase();
+        const firestore = admin.firestore();
+        const collection = await firestore.collection('productos');
+        const querySnapshot = await collection.get();
+        const docs = querySnapshot.docs;
+
+        const bdProductos = docs.map((doc) => ({
+            id: doc.id,
+            timestamp: doc.data().timestamp,
+            nombre: doc.data().nombre,
+            descripcion: doc.data().descripcion,
+            codigo: doc.data().codigo,
+            foto: doc.data().foto,
+            precio: doc.data().precio,
+            stock: doc.data().stock
+        }));
+
+        return bdProductos;
     }
 
 };
 
-const controller = bdConfig(bdSeleccionada);
+const bdProductos = bdConfig(bdSeleccionada);
+
+const controllerConfig = (bdSeleccionada) => {
+    if (bdSeleccionada === 0) {
+        const Productos = require('../controller/fs/productos');
+        return Productos;
+    } else if (bdSeleccionada === 1) {
+        const Productos = require('../controller/mariaDB/productos');
+        return Productos;
+    } else if (bdSeleccionada === 2) {
+        const Productos = require('../controller/SQlite3/productos');
+        return Productos;
+    } else if (bdSeleccionada === 3) {
+        const Productos = require('../controller/mongoDB/productos');
+        return Productos;
+    } else if (bdSeleccionada === 4) {
+        const Productos = require('../controller/firebase/productos');
+        return Productos;
+    }
+};
+
 
 // RUTAS
 router.get('/listar', async (req,res) => {
     try {     
-        const bd = await controller;
-        const productos = await bd.listar();
+        const Productos = controllerConfig(bdSeleccionada);
+        const controller = new Productos(bdProductos);
+        const productos = await controller.listar();
         res.json(productos);
     } catch (err) {
         res.status(err).send("Ha habido un error");
@@ -105,6 +146,8 @@ router.get('/listar', async (req,res) => {
 router.get('/listar/:id', async (req,res) => {
     try {
         const params = req.params;
+        const Productos = controllerConfig(bdSeleccionada);
+        const controller = new Productos(bdProductos);
         const producto = await controller.listarId(params.id);
         res.json(producto);
     } catch (err) {
@@ -116,8 +159,9 @@ router.post('/agregar', async (req,res) => {
     if (server.isAdmin) {
         try {
             const productoBody = req.body;
-            const bd = await controller;
-            await bd.agregar(productoBody);
+            const Productos = controllerConfig(bdSeleccionada);
+            const controller = new Productos(bdProductos);
+            await controller.agregar(productoBody);
             res.send('Producto agregado con éxito');
         }
         catch (err) {
@@ -134,6 +178,8 @@ router.put('/actualizar/:id', async (req,res) => {
         try {
             const params = req.params;
             const productoBody = req.body;
+            const Productos = controllerConfig(bdSeleccionada);
+            const controller = new Productos(bdProductos);
             await controller.actualizar(params.id,productoBody);
             res.send('Producto actualizado con éxito');
         } catch (err) {
@@ -149,6 +195,8 @@ router.delete('/borrar/:id', async (req,res) => {
     if (server.isAdmin) {
         try {
             const params = req.params;
+            const Productos = controllerConfig(bdSeleccionada);
+            const controller = new Productos(bdProductos);
             await controller.borrar(params.id);
             res.send('Producto eliminado con éxito');
         }

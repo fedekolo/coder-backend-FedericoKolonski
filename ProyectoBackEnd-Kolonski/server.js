@@ -28,4 +28,15 @@ app.get('/admin',(req,res) => {
     } catch {
         console.log(err);
     }
-})
+});
+
+// CONFIG BD
+const bdSeleccionada = 0; //determina la base de datos a utilizar
+module.exports.bdSeleccionada = bdSeleccionada;
+// app.get('/bdseleccionada',(req,res) => {
+//     try {
+//         res.json(bdSeleccionada);
+//     } catch {
+//         console.log(err);
+//     }
+// });

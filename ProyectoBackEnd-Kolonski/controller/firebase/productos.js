@@ -1,5 +1,4 @@
 // CONFIG INICIAL
-const Producto = require('../../bd/mongoDB/models/productos');
 const moment = require('moment');
 
 // FUNCIONES
@@ -14,29 +13,37 @@ class Productos {
 
     async listarId(id) {
         try {
-            const productoFiltrado = await Producto.find({id: id});
+            const doc = this.bd.doc(`${id}`);
+            const item = await doc.get();
+            const productoFiltrado = item.data();
             return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error");
         }
     }
 
-    async guardar(productoBody) {
-        const productoParaAgregar = [{
-            id: this.bd.length+1,
+    async agregar(productoBody) {
+        const productoParaAgregar = {
+            id: Math.round(Math.random() * (1000000 - 1) + 1),
             timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
+            nombre: productoBody.nombre,
             descripcion: productoBody.descripcion,
             codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
+            foto: productoBody.foto,
+            precio: productoBody.precio,
             stock: productoBody.stock
-        }];
+        };
 
         try {
-            await Producto(productoParaAgregar).save();
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = await firestore.collection('productos');
+            const doc = collection.doc();
+            await doc.create(productoParaAgregar);
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error",err);
         }
     }
 
@@ -52,7 +59,7 @@ class Productos {
             await Producto.updateOne({id: id}, {$set: productoActualizado});
             return productoActualizado;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error");
         }
     }
 
@@ -61,7 +68,7 @@ class Productos {
             await Producto.deleteOne({id: id});
             return;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error");
         }    
     }
 

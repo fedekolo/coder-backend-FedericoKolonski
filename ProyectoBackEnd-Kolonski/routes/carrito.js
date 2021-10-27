@@ -10,8 +10,8 @@ const bdConfig = async (bdSeleccionada) => {
     if (bdSeleccionada === 0) {
         // FILE SYSTEM
 
-        const Carrito = require('../controller/fs/carrito');
-        return new Carrito('../bd/fs/carrito.txt');
+        const bdProductos = '../bd/fs/carrito.txt';
+        return bdProductos;
 
     } else if (bdSeleccionada === 1) {
         // MARIA DB
@@ -42,9 +42,8 @@ const bdConfig = async (bdSeleccionada) => {
             }
         })();
 
-        const Carrito = require('../controller/mariaDB/carrito');
         const bdCarrito = await knexMariaDB.from('carrito').select('*');
-        return new Carrito(bdCarrito);
+        return bdCarrito;
 
     } else if (bdSeleccionada === 2) {
         // SQLITE3
@@ -75,19 +74,17 @@ const bdConfig = async (bdSeleccionada) => {
             }
         })();
 
-        const Carrito = require('../controller/SQlite3/carrito');
         const bdCarrito = await knexSQlite3.from('carrito').select('*');
-        return new Carrito(bdCarrito);
+        return bdCarrito;
 
     } else if (bdSeleccionada === 3) {
         // MONGODB
 
         const conexionMongoDB = require('../bd/mongoDB/conexionDB');
         conexionMongoDB();
-        const Carrito = require('../controller/mongoDB/carrito');
         const ProductoCarrito = require('../bd/mongoDB/models/carrito');
         const bdProductos = await ProductoCarrito.find().lean();
-        return new Carrito(bdProductos);
+        return bdProductos;
 
     } else if (bdSeleccionada === 4) {
         // FIREBASE
@@ -95,20 +92,39 @@ const bdConfig = async (bdSeleccionada) => {
         const admin = require("firebase-admin");
         const conexionFirebase = require('../bd/firebase/firebase');
         conexionFirebase();
-        const Carrito = require('../controller/firebase/carrito');
         const firestore = admin.firestore();
         const bdProductos = await firestore.collection('carrito');
-        return new Carrito(bdProductos);
+        return bdProductos;
     }
 
 };
 
-const controller = bdConfig(bdSeleccionada);
+const bdProductos = bdConfig(bdSeleccionada);
+
+const controllerConfig = (bdSeleccionada) => {
+    if (bdSeleccionada === 0) {
+        const Carrito = require('../controller/fs/carrito');
+        return Carrito;
+    } else if (bdSeleccionada === 1) {
+        const Carrito = require('../controller/mariaDB/carrito');
+        return Carrito;
+    } else if (bdSeleccionada === 2) {
+        const Carrito = require('../controller/SQlite3/carrito');
+        return Carrito;
+    } else if (bdSeleccionada === 3) {
+        const Carrito = require('../controller/mongoDB/carrito');
+        return Carrito;
+    } else if (bdSeleccionada === 4) {
+        const Carrito = require('../controller/firebase/carrito');
+        return Carrito;
+    }
+};
 
 // RUTAS
 router.get('/listar', async (req,res) => {
-    console.log(controller)
     try {
+        const Carrito = controllerConfig(bdSeleccionada);
+        const controller = new Carrito(bdProductos);
         const productos = await controller.listar();
         res.json(productos);
     } catch (err) {
@@ -119,6 +135,8 @@ router.get('/listar', async (req,res) => {
 router.get('/listar/:id', async (req,res) => {
     try {
         const params = req.params;
+        const Carrito = controllerConfig(bdSeleccionada);
+        const controller = new Carrito(bdProductos);
         const producto = await controller.listarId(params.id);
         res.json(producto);
     } catch (err) {
@@ -129,6 +147,8 @@ router.get('/listar/:id', async (req,res) => {
 router.post('/agregar/:id', async (req,res) => {
         try {
             const params = req.params;
+            const Carrito = controllerConfig(bdSeleccionada);
+            const controller = new Carrito(bdProductos);
             await controller.agregar(params.id);
             res.send('Producto agregado al carrito con éxito');
         }
@@ -140,6 +160,8 @@ router.post('/agregar/:id', async (req,res) => {
 router.delete('/borrar/:id', async (req,res) => {
         try {
             const params = req.params;
+            const Carrito = controllerConfig(bdSeleccionada);
+            const controller = new Carrito(bdProductos);
             await controller.borrar(params.id);
             res.send('Producto eliminado con éxito');
         }
@@ -148,4 +170,4 @@ router.delete('/borrar/:id', async (req,res) => {
         }
 });
 
-module.exports = {router, bdSeleccionada};
+module.exports = {router};
