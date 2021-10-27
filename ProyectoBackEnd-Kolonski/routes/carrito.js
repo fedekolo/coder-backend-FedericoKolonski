@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 4; 
+const bdSeleccionada = 0; 
 
 const bdConfig = async (bdSeleccionada) => {
     

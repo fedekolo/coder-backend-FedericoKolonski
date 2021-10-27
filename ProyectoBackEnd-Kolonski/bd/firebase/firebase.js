@@ -4,13 +4,11 @@ const serviceAccount = require("./ecommerce-backend-e1c99-firebase-adminsdk-esvs
 const conexionFirebase = () => {
 
     if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://ecommerce-backend-e1c99-firebaseio.com"
+      const firebaseAdmin = admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount),
+          databaseURL: "https://ecommerce-backend-e1c99-firebaseio.com"
       });
-    }else {
-      admin.app(); 
-    }
+  }
     
     console.log('Conectando a la base de datos FireBase...');
 };

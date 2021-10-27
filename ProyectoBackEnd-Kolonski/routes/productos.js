@@ -4,14 +4,14 @@ const router = express.Router();
 const server = require('../server'); 
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 4; 
+const bdSeleccionada = 4;
 
-const bdConfig = async (bdSeleccionada) => {
+const bdConfig = (bdSeleccionada) => {
     
     if (bdSeleccionada === 0) {
         // FILE SYSTEM
 
-        const bdProductos = '../controller/fs/productos';
+        const bdProductos = './bd/fs/productos.txt';
         return bdProductos;
 
     } else if (bdSeleccionada === 1) {
@@ -31,7 +31,8 @@ const bdConfig = async (bdSeleccionada) => {
                         table.integer('precio'),
                         table.string('foto'),
                         table.integer('stock'),
-                        table.integer('id')
+                        table.integer('id'),
+                        table.string('timestamp')
                       });
                     }
                   });
@@ -42,7 +43,7 @@ const bdConfig = async (bdSeleccionada) => {
                 knexMariaDB.destroy();
             }
         })();
-        const bdProductos = await knexMariaDB.from('productos').select('*');
+        const bdProductos = knexMariaDB.from('productos').select('*');
         return bdProductos;
     } else if (bdSeleccionada === 2) {
         // SQLITE3
@@ -61,7 +62,8 @@ const bdConfig = async (bdSeleccionada) => {
                             table.integer('precio'),
                             table.string('foto'),
                             table.integer('stock'),
-                            table.integer('id')
+                            table.integer('id'),
+                            table.string('timestamp')
                         });
                     }
                     });
@@ -72,7 +74,7 @@ const bdConfig = async (bdSeleccionada) => {
                 knexSQlite3.destroy();
             }
         })();
-        const bdProductos = await knexSQlite3.from('productos').select('*');
+        const bdProductos = knexSQlite3.from('productos').select('*');
         return bdProductos;
     } else if (bdSeleccionada === 3) {
         // MONGODB
@@ -80,33 +82,37 @@ const bdConfig = async (bdSeleccionada) => {
         const conexionMongoDB = require('../bd/mongoDB/conexionDB');
         conexionMongoDB();
         const Producto = require('../bd/mongoDB/models/productos');
-        const bdProductos = await Producto.find().lean();
+        const bdProductos = Producto.find().lean();
         return bdProductos;
+
     } else if (bdSeleccionada === 4) {
         // FIREBASE
+        
+        const bdProductos = async () => {
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = firestore.collection('productos');
+            const querySnapshot = await collection.get();
+            const docs = querySnapshot.docs;
+    
+            const bd = docs.map((doc) => ({
+                id: doc.id,
+                timestamp: doc.data().timestamp,
+                nombre: doc.data().nombre,
+                descripcion: doc.data().descripcion,
+                codigo: doc.data().codigo,
+                foto: doc.data().foto,
+                precio: doc.data().precio,
+                stock: doc.data().stock
+            }));
 
-        const admin = require("firebase-admin");
-        const conexionFirebase = require('../bd/firebase/firebase');
-        conexionFirebase();
-        const firestore = admin.firestore();
-        const collection = await firestore.collection('productos');
-        const querySnapshot = await collection.get();
-        const docs = querySnapshot.docs;
+            return bd;
+        };
 
-        const bdProductos = docs.map((doc) => ({
-            id: doc.id,
-            timestamp: doc.data().timestamp,
-            nombre: doc.data().nombre,
-            descripcion: doc.data().descripcion,
-            codigo: doc.data().codigo,
-            foto: doc.data().foto,
-            precio: doc.data().precio,
-            stock: doc.data().stock
-        }));
-
-        return bdProductos;
+        return bdProductos();
     }
-
 };
 
 const bdProductos = bdConfig(bdSeleccionada);

@@ -8,5 +8,15 @@
 		"foto": "https://carrefourar.vtexassets.com/arquivos/ids/191443/7790895000997_02.jpg",
 		"precio": "120",
 		"stock": "153"
+	},
+	{
+		"id": 2,
+		"timestamp": "27/10/2021 7:13:36 pm",
+		"nombre": "Coca",
+		"descripcion": "Buena",
+		"codigo": "13413",
+		"foto": "holis",
+		"precio": "1200",
+		"stock": "121"
 	}
 ]
