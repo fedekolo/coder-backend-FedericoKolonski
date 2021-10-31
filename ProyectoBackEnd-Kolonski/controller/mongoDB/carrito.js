@@ -1,6 +1,9 @@
 // CONFIG INICIAL
 const ProductoCarrito = require('../../bd/mongoDB/models/carrito');
+const Producto = require('../../bd/mongoDB/models/productos');
 const moment = require('moment');
+const conexionMongoDB = require('../../bd/mongoDB/conexionDB');
+const mongoose = require('mongoose');
 
 // FUNCIONES
 class Carrito {
@@ -21,48 +24,22 @@ class Carrito {
         }
     }
 
-    async agregar(productoBody) {
-        const productoParaAgregar = [{
-            id: this.bd.length+1,
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        }];
-
+    async agregar(id) {
+        conexionMongoDB();
         try {
-            await ProductoCarrito(productoParaAgregar).save();
-        } catch (err) {
-            console.log('Error en proceso:', err);
-        }
-    }
-
-    async actualizar(id,productoBody) {      
-        const productoActualizado = {
-            id: id,
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        };
-
-        try {
-            await ProductoCarrito.updateOne({id: id}, {$set: productoActualizado});
-            return productoActualizado;
+            const productoFiltrado = await Producto.find({id: id});
+            await ProductoCarrito(productoFiltrado).save();
+            mongoose.disconnect();
         } catch (err) {
             console.log('Error en proceso:', err);
         }
     }
 
     async borrar(id) {
+        conexionMongoDB();
         try {
             await ProductoCarrito.deleteOne({id: id});
+            mongoose.disconnect();
             return;
         } catch (err) {
             console.log('Error en proceso:', err);

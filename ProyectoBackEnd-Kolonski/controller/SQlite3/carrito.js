@@ -16,7 +16,7 @@ class Carrito {
     async listarId(id) {
         (async () => {
             try {
-                const productoFiltrado = await knexSQlite3('carrito').select('*').where('id', '==', id);
+                const productoFiltrado = await knexSQlite3('carrito').select('*').where('id', '=', id);
                 return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado;
             }
         
@@ -30,7 +30,7 @@ class Carrito {
     async agregar(id) {
         (async () => {
             try {
-                const productoFiltrado = await knexSQlite3('productos').select('*').where('id', '==', id);
+                const productoFiltrado = await knexSQlite3('productos').select('*').where('id', '=', id);
                 productoFiltrado.timestamp = moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a');
                 await knexSQlite3('carrito').insert(productoFiltrado);
                 return;

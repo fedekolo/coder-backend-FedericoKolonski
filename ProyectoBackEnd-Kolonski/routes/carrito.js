@@ -1,16 +1,17 @@
 // CONFIG INICIAL
 const express = require('express');
 const router = express.Router();
+const server = require('../server');
 
 // CONEXION CON BD FACTORY
 const bdSeleccionada = 0; 
 
-const bdConfig = async (bdSeleccionada) => {
+const bdConfig = (bdSeleccionada) => {
     
     if (bdSeleccionada === 0) {
         // FILE SYSTEM
 
-        const bdProductos = '../bd/fs/carrito.txt';
+        const bdProductos = './bd/fs/carrito.txt';
         return bdProductos;
 
     } else if (bdSeleccionada === 1) {
@@ -24,13 +25,14 @@ const bdConfig = async (bdSeleccionada) => {
                 await knexMariaDB.schema.hasTable('carrito').then((exists) => {
                     if (!exists) {
                       return knexMariaDB.schema.createTable('carrito', (table) => {
-                        table.string('title'),
-                        table.string('description'),
+                        table.string('nombre'),
+                        table.string('descripcion'),
                         table.integer('codigo'),
-                        table.integer('price'),
-                        table.string('thumbnail'),
+                        table.integer('precio'),
+                        table.string('foto'),
                         table.integer('stock'),
-                        table.integer('id')
+                        table.integer('id'),
+                        table.string('timestamp')
                       });
                     }
                   });
@@ -42,7 +44,7 @@ const bdConfig = async (bdSeleccionada) => {
             }
         })();
 
-        const bdCarrito = await knexMariaDB.from('carrito').select('*');
+        const bdCarrito = knexMariaDB.from('carrito').select('*');
         return bdCarrito;
 
     } else if (bdSeleccionada === 2) {
@@ -56,13 +58,14 @@ const bdConfig = async (bdSeleccionada) => {
                 await knexSQlite3.schema.hasTable('carrito').then((exists) => {
                     if (!exists) {
                       return knexSQlite3.schema.createTable('carrito', (table) => {
-                        table.string('title'),
-                        table.string('description'),
+                        table.string('nombre'),
+                        table.string('descripcion'),
                         table.integer('codigo'),
-                        table.integer('price'),
-                        table.string('thumbnail'),
+                        table.integer('precio'),
+                        table.string('foto'),
                         table.integer('stock'),
-                        table.integer('id')
+                        table.integer('id'),
+                        table.string('timestamp')
                       });
                     }
                   });
@@ -74,27 +77,52 @@ const bdConfig = async (bdSeleccionada) => {
             }
         })();
 
-        const bdCarrito = await knexSQlite3.from('carrito').select('*');
+        const bdCarrito = knexSQlite3.from('carrito').select('*');
         return bdCarrito;
 
     } else if (bdSeleccionada === 3) {
         // MONGODB
 
-        const conexionMongoDB = require('../bd/mongoDB/conexionDB');
-        conexionMongoDB();
-        const ProductoCarrito = require('../bd/mongoDB/models/carrito');
-        const bdProductos = await ProductoCarrito.find().lean();
-        return bdProductos;
+        const bdProductos = async () => {
+            const mongoose = require('mongoose');
+            const conexionMongoDB = require('../bd/mongoDB/conexionDB');
+            conexionMongoDB();
+            const ProductoCarrito = require('../bd/mongoDB/models/carrito');
+            const bdProductos = await ProductoCarrito.find().lean();
+            await mongoose.connection.close();
+            return bdProductos;
+        }
+
+        return bdProductos();
 
     } else if (bdSeleccionada === 4) {
         // FIREBASE
 
-        const admin = require("firebase-admin");
-        const conexionFirebase = require('../bd/firebase/firebase');
-        conexionFirebase();
-        const firestore = admin.firestore();
-        const bdProductos = await firestore.collection('carrito');
-        return bdProductos;
+        const bdProductos = async () => {
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = firestore.collection('carrito');
+            const querySnapshot = await collection.get();
+            const docs = querySnapshot.docs;
+    
+            const bd = docs.map((doc) => ({
+                id: doc.id,
+                timestamp: doc.data().timestamp,
+                nombre: doc.data().nombre,
+                descripcion: doc.data().descripcion,
+                codigo: doc.data().codigo,
+                foto: doc.data().foto,
+                precio: doc.data().precio,
+                stock: doc.data().stock
+            }));
+
+            return bd;
+        };
+
+        return bdProductos();
+
     }
 
 };

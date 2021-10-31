@@ -4,7 +4,7 @@ const router = express.Router();
 const server = require('../server'); 
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 4;
+const bdSeleccionada = 0;
 
 const bdConfig = (bdSeleccionada) => {
     
@@ -45,6 +45,7 @@ const bdConfig = (bdSeleccionada) => {
         })();
         const bdProductos = knexMariaDB.from('productos').select('*');
         return bdProductos;
+        
     } else if (bdSeleccionada === 2) {
         // SQLITE3
 
@@ -79,11 +80,17 @@ const bdConfig = (bdSeleccionada) => {
     } else if (bdSeleccionada === 3) {
         // MONGODB
 
-        const conexionMongoDB = require('../bd/mongoDB/conexionDB');
-        conexionMongoDB();
-        const Producto = require('../bd/mongoDB/models/productos');
-        const bdProductos = Producto.find().lean();
-        return bdProductos;
+        const bdProductos = async () => {
+            const mongoose = require('mongoose');
+            const conexionMongoDB = require('../bd/mongoDB/conexionDB');
+            conexionMongoDB();
+            const Producto = require('../bd/mongoDB/models/productos');
+            const bdProductos = await Producto.find().lean();
+            await mongoose.connection.close();
+            return bdProductos;
+        }
+
+        return bdProductos();
 
     } else if (bdSeleccionada === 4) {
         // FIREBASE

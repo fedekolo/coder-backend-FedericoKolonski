@@ -24,7 +24,7 @@ class Carrito {
     }
 
     async agregar(id) {
-        const productos = await fs.promises.readFile('./bd/productos.txt','utf-8');
+        const productos = await fs.promises.readFile('./bd/fs/productos.txt','utf-8');
         const productosObj = JSON.parse(productos);
         const carrito = await fs.promises.readFile(this.bd,'utf-8');
         const carritoObj = JSON.parse(carrito);

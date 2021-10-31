@@ -18,59 +18,41 @@ class Carrito {
             const productoFiltrado = item.data();
             return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error",err);
         }
     }
 
-    async agregar(productoBody) {
-        const productoParaAgregar = {
-            id: this.bd.length+1,
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        };
-
+    async agregar(id) {
         try {
-            const doc = this.bd.doc(`${id}`);
-            await doc.create(productoParaAgregar);
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = firestore.collection('productos');
+            const querySnapshot = collection.doc(`${id}`);
+            const item = await querySnapshot.get();
+            const productoFiltrado = item.data();
+            const collectionCarrito = firestore.collection('carrito');
+            const bdCarrito = collectionCarrito.doc();
+            await bdCarrito.create(productoFiltrado);
             return;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
-        }
-    }
-
-    async actualizar(id,productoBody) {      
-        const productoActualizado = {
-            id: id,
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        };
-
-        try {
-            const doc = this.bd.doc(`${id}`);
-            await doc.update(productoActualizado);
-            return;
-        } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error",err);
         }
     }
 
     async borrar(id) {
         try {
-            const doc = this.bd.doc(`${id}`);
-            await doc.delete();
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collectionCarrito = firestore.collection('carrito');
+            const querySnapshot = collectionCarrito.doc(`${id}`);
+            await querySnapshot.delete();
             return;
         } catch (err) {
-            res.status(err).send("Ha habido un error");
+            console.log("Ha habido un error",err);
         }    
     }
 

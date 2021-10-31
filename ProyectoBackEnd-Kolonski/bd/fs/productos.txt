@@ -18,5 +18,15 @@
 		"foto": "holis",
 		"precio": "1200",
 		"stock": "121"
+	},
+	{
+		"id": 3,
+		"timestamp": "31/10/2021 4:31:23 pm",
+		"nombre": "Cremita",
+		"descripcion": "Sabrosa y dulce",
+		"codigo": "1231",
+		"foto": "https://carrefourar.vtexassets.com/arquivos/ids/191443/7790895000997_02.jpg",
+		"precio": "400",
+		"stock": "450"
 	}
 ]

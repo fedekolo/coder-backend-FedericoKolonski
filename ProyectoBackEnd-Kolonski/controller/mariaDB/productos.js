@@ -55,9 +55,13 @@ class Productos {
 
     actualizar(id,productoBody) {      
         const productoActualizado = {
-            title: productoBody.title,
-            price: productoBody.price,
-            thumbnail: productoBody.thumbnail,
+            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
+            nombre: productoBody.nombre,
+            descripcion: productoBody.descripcion,
+            codigo: productoBody.codigo,
+            foto: productoBody.foto,
+            precio: productoBody.precio,
+            stock: productoBody.stock,
             id: id
         };
 

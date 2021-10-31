@@ -49,27 +49,43 @@ class Productos {
 
     async actualizar(id,productoBody) {      
         const productoActualizado = {
-            title: productoBody.title,
-            price: productoBody.price,
-            thumbnail: productoBody.thumbnail,
+            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
+            nombre: productoBody.nombre,
+            descripcion: productoBody.descripcion,
+            codigo: productoBody.codigo,
+            foto: productoBody.foto,
+            precio: productoBody.precio,
+            stock: productoBody.stock,
             id: id
         };
 
         try {
-            await Producto.updateOne({id: id}, {$set: productoActualizado});
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = await firestore.collection('productos');
+            const doc = collection.doc(`${id}`);
+            await doc.update(productoActualizado);
             return productoActualizado;
         } catch (err) {
-            console.log("Ha habido un error");
+            console.log("Ha habido un error",err);
         }
     }
 
     async borrar(id) {
         try {
-            await Producto.deleteOne({id: id});
+            const admin = require("firebase-admin");
+            const conexionFirebase = require('../../bd/firebase/firebase');
+            conexionFirebase();
+            const firestore = admin.firestore();
+            const collection = await firestore.collection('productos');
+            const doc = collection.doc(`${id}`);
+            await doc.delete();
             return;
         } catch (err) {
-            console.log("Ha habido un error");
-        }    
+            console.log("Ha habido un error",err);
+        }   
     }
 
 }

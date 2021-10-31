@@ -1,6 +1,8 @@
 // CONFIG INICIAL
 const Producto = require('../../bd/mongoDB/models/productos');
 const moment = require('moment');
+const conexionMongoDB = require('../../bd/mongoDB/conexionDB');
+const mongoose = require('mongoose');
 
 // FUNCIONES
 class Productos {
@@ -22,27 +24,9 @@ class Productos {
     }
 
     async agregar(productoBody) {
-        const productoParaAgregar = {
+        conexionMongoDB();
+        const productoParaAgregar = [{
             id: Math.round(Math.random() * (1000000 - 1) + 1),
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        };
-
-        try {
-            await new Producto(productoParaAgregar).save();
-        } catch (err) {
-            console.log('Error en proceso:', err);
-        }
-    }
-
-    async actualizar(id,productoBody) {      
-        const productoActualizado = [{
-            id: id,
             timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
             title: productoBody.nombre,
             descripcion: productoBody.descripcion,
@@ -53,6 +37,27 @@ class Productos {
         }];
 
         try {
+            await Producto(productoParaAgregar).save();
+            mongoose.disconnect();
+        } catch (err) {
+            console.log('Error en proceso:', err);
+        }
+    }
+
+    async actualizar(id,productoBody) { 
+        conexionMongoDB();     
+        const productoActualizado = {
+            id: id,
+            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
+            title: productoBody.nombre,
+            descripcion: productoBody.descripcion,
+            codigo: productoBody.codigo,
+            thumbnail: productoBody.foto,
+            price: productoBody.precio,
+            stock: productoBody.stock
+        };
+
+        try {
             await Producto.updateOne({id: id}, {$set: productoActualizado});
             return productoActualizado;
         } catch (err) {
@@ -61,6 +66,7 @@ class Productos {
     }
 
     async borrar(id) {
+        conexionMongoDB();  
         try {
             await Producto.deleteOne({id: id});
             return;
