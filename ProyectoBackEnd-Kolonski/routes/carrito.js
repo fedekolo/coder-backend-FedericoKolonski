@@ -4,7 +4,7 @@ const router = express.Router();
 const server = require('../server');
 
 // CONEXION CON BD FACTORY
-const bdSeleccionada = 0; 
+const bdSeleccionada = 3; 
 
 const bdConfig = (bdSeleccionada) => {
     

@@ -10,7 +10,7 @@ const conexionDB = async () => {
             useUnifiedTopology: true,
             serverSelectionTimeoutMS: 1000
         });
-    
+        
 }
 
 module.exports = conexionDB;

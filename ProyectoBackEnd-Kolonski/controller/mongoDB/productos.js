@@ -24,19 +24,19 @@ class Productos {
     }
 
     async agregar(productoBody) {
-        conexionMongoDB();
-        const productoParaAgregar = [{
-            id: Math.round(Math.random() * (1000000 - 1) + 1),
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        }];
-
+        
         try {
+            await conexionMongoDB();
+            const productoParaAgregar = {
+                id: Math.round(Math.random() * (1000000 - 1) + 1),
+                timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
+                title: productoBody.nombre,
+                descripcion: productoBody.descripcion,
+                codigo: productoBody.codigo,
+                thumbnail: productoBody.foto,
+                price: productoBody.precio,
+                stock: productoBody.stock
+            };
             await Producto(productoParaAgregar).save();
             mongoose.disconnect();
         } catch (err) {
@@ -66,9 +66,10 @@ class Productos {
     }
 
     async borrar(id) {
-        conexionMongoDB();  
         try {
+            await conexionMongoDB();  
             await Producto.deleteOne({id: id});
+            mongoose.disconnect();
             return;
         } catch (err) {
             console.log('Error en proceso:', err);
