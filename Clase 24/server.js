@@ -174,13 +174,14 @@ io.on('connection', async (socket) => {
 });
 
 // CONFIG USERS
-// function auth (req, res, next)  {
-//     if (req.session?.admin) {
-//         return next();
-//     } else {
-//         return res.sendStatus(401);
-//     }
-// }
+const auth = (req, res, next) => {
+
+    if (req.session?.admin) {
+        return next();
+    } else {
+        return res.sendStatus(401);
+    }
+}
 
 // RUTAS
 router.get('/',(req,res) => {
@@ -190,11 +191,11 @@ router.get('/',(req,res) => {
 routerApi.get('/productos/agregar', async (req,res) => {
     try {
         conexionDB();
-        // console.log(auth());
         const bdProductos = await Producto.find().lean();
         const bd = new Archivo(bdProductos);
         const archivo = await bd.listar();
         const sinProductos = archivo.length==0 ? true : false;
+        console.log(req.session?.user)
         res.render('add',{producto: archivo,sinProductos: sinProductos});
     } catch (err) {
         console.log(err);
@@ -276,16 +277,16 @@ routerApi.delete('/productos/borrar/:id', async (req,res) => {
     }
 });
 
-app.get('/login', (req,res)=>{
-    if (!req.query.usuario || !req.query.contrasena) {
-        res.send('Login failed!');
-    } else if (req.query.usuario == "fede" && req.query.contrasena == "123"){
+app.post('/login', (req,res)=>{
+    if (req.body.usuario == "fede" && req.body.contrasena == "123"){
         req.session.user = "fede";
         req.session.admin = true;
+        console.log(req.session)
         res.redirect('/api/productos/agregar');
     } else {
-        alert('Usuario o contraseña erroneos.');
-        res.redirect('/api/productos/agregar');
+        res.send('Usuario o contraseña erroneos.');
+        // res.redirect('/api/productos/agregar');
     }
 });
+
 
