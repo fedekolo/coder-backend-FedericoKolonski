@@ -1,0 +1,95 @@
+{{#if admin}}
+    <div class="alert alert-primary" role="alert">
+        <h2>Bienvenido {{user}}</h2>
+        <button type="button" class="btn btn-warning" onclick="desloguear({{user}})">Desloguearse</button>
+    </div>
+{{else}}
+    <form method="POST" action="/login" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="usuario" placeholder="Usuario" name="usuario" required>
+        <label for="usuario">Usuario</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="password" class="form-control" id="contrasena" placeholder="Contraseña" name="contrasena" required>
+        <label for="contrasena">Contraseña</label>
+    </div>
+    <button type="sumbit" class="btn btn-info" style=" width: 100%;">Enviar</button>
+</form>
+{{/if}}
+<h1 style="text-align: center; margin-top: 20px;">Actualizar contenido</h1>
+<form method="POST" action="/api/productos/guardar" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="floatingTitle" placeholder="Title" name="title" required>
+        <label for="floatingTitle">Title</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="number" class="form-control" id="floatingPrice" placeholder="Price" name="price" required>
+        <label for="floatingPrice">Price</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="floatingThumbnail" placeholder="Thumbnail" name="thumbnail" required>
+        <label for="floatingThumbnail">Thumbnail</label>
+    </div>
+    <button onclick="refrescarListado()" type="sumbit" class="btn btn-info" style=" width: 100%;">Enviar</button>
+</form>
+<table class="table table-striped table-hover" style="width: 80%; margin: auto; text-align:center;">
+    <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Foto</th>
+        </tr>
+    </thead>
+    <tbody id="listado-productos">
+        {{#if sinProductos}}
+            <tr>
+                <td></td>
+                <td><h3>No hay productos para mostrar</h3></td>
+                <td></td>
+            </tr>
+        {{else}}
+            {{#each producto}}
+                <tr>
+                    <td>{{this.title}}</td>
+                    <td>${{this.price}}</td>
+                    <td><img src="{{this.thumbnail}}" alt="{{this.title}}"style="height: 30px;"></td>
+                </tr>
+            {{/each}}
+        {{/if}}
+    </tbody>
+</table>
+<h1 style="text-align: center; margin-top: 40px;">Centro de mensajes</h1>
+<form onsubmit="return envioMensaje(this)" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
+    <div class="form-floating mb-3">
+        <input type="mail" class="form-control" id="mail" placeholder="Mail" name="mail" required>
+        <label for="mail">Mail</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="nombre" placeholder="Nombre" name="nombre" required>
+        <label for="nombre">Nombre</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="apellido" placeholder="Apellido" name="apellido" required>
+        <label for="apellido">Apellido</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="number" class="form-control" id="edad" placeholder="Edad" name="edad" required>
+        <label for="edad">Edad</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="alias" placeholder="Alias" name="alias" required>
+        <label for="alias">Alias</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="avatar" placeholder="Avatar" name="avatar" required>
+        <label for="avatar">Avatar</label>
+    </div>
+    <div class="divisor" style="width: 100%; margin: 20px auto; height: 3px; background-color:rgba(0, 0, 0, 0.123); border-radius: 3px;"></div>
+    <h4 style="text-align: center;">Mensajes</h3>
+    <div id="mensajes"></div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="mensaje" placeholder="Mensaje" name="mensaje" required>
+        <label for="mensaje">Mensaje</label>
+    </div>
+    <button type="sumbit" class="btn btn-info" style=" width: 100%;">Enviar mensaje</button>
+</form>
