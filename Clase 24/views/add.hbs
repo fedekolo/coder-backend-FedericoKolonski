@@ -1,4 +1,10 @@
-<form method="POST" action="/login" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
+{{#if admin}}
+    <div class="alert alert-primary" role="alert">
+        <h2>Bienvenido {{user}}</h2>
+        <button type="button" class="btn btn-warning" onclick="desloguear({{user}})">Desloguearse</button>
+    </div>
+{{else}}
+    <form method="POST" action="/login" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
     <div class="form-floating mb-3">
         <input type="text" class="form-control" id="usuario" placeholder="Usuario" name="usuario" required>
         <label for="usuario">Usuario</label>
@@ -9,6 +15,7 @@
     </div>
     <button type="sumbit" class="btn btn-info" style=" width: 100%;">Enviar</button>
 </form>
+{{/if}}
 <h1 style="text-align: center; margin-top: 20px;">Actualizar contenido</h1>
 <form method="POST" action="/api/productos/guardar" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
     <div class="form-floating mb-3">

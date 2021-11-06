@@ -60,3 +60,10 @@ const refrescarChat = () => {
     const productoNuevo = {title:title,price:price,thumbnail:thumbnail};
     title=="" || price=="" || thumbnail=="" ? alert("Faltan campos por completar") : socket.emit('refrescar',productoNuevo);
 };
+
+// DESLOGUEO
+
+const desloguear = (user) => {
+    alert(`Hasta luego ${user}`);
+    setTimeout( () => window.location.href = "/logout", 2000 );
+}
