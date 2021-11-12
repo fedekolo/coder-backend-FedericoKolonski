@@ -6,7 +6,7 @@ const app = express();
 const conexionDB = require('../db/conexionDB');
 const Producto = require('../models/productos');
 const Archivo = require('../controller/productos');
-const passport = require('../controller/passport');
+// const passport = require('passport');
 
 // CONFIG USERS
 const auth = (req, res, next) => {
@@ -15,7 +15,7 @@ const auth = (req, res, next) => {
     } else {
         return res.sendStatus(401);
     }
-}
+};
 
 // RUTAS
 router.get('/',(req,res) => {
@@ -111,32 +111,34 @@ routerApi.delete('/productos/borrar/:id', async (req,res) => {
     }
 });
 
-app.post('/login', (req,res)=>{
-    if (req.body.usuario == "fede" && req.body.contrasena == "123"){
-        req.session.user = "fede";
-        req.session.admin = true;
-        req.session.cookie.maxAge = 60000;
-        res.redirect('/api/productos/agregar');
-    } else {
-        res.send('Usuario o contraseña erroneos.');
-    }
-});
+// app.post('/login', (req,res)=>{
+//     if (req.body.usuario == "fede" && req.body.contrasena == "123"){
+//         req.session.user = "fede";
+//         req.session.admin = true;
+//         req.session.cookie.maxAge = 60000;
+//         res.redirect('/api/productos/agregar');
+//     } else {
+//         res.send('Usuario o contraseña erroneos.');
+//     }
+// });
 
-router.get('/login',(req,res) => {
-    res.render('login');
-});
+// router.get('/login',(req,res) => {
+//     res.render('login');
+// });
 
-router.post('/signup', passport.authenticate('signup', { failureFlash: 'Hubo un error en los datos ingresados. Puede que el usuario ya exista.' }), (req,res) => {
-    res.redirect('/api/productos/agregar');
-});
+// router.post('/signup', passport.authenticate('signup', 
+// { failureFlash: 'Hubo un error en los datos ingresados. Puede que el usuario ya exista.' }), 
+// (req,res) => {
+//     res.redirect('/api/productos/agregar');
+// });
 
-router.get('/signup',(req,res) => {
-    res.render('signup');
-});
+// router.get('/signup',(req,res) => {
+//     res.render('signup');
+// });
 
-app.get('/logout', (req,res)=>{
-    req.session.destroy();
-    res.redirect('/api/productos/agregar');
-});
+// app.get('/logout', (req,res)=>{
+//     req.session.destroy();
+//     res.redirect('/api/productos/agregar');
+// });
 
 module.exports = { router, routerApi, app };

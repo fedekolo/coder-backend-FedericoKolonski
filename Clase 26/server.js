@@ -2,6 +2,7 @@
 const express = require('express');
 const handlebars = require('express-handlebars');
 const app = express();
+const flash = require('express-flash');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 // const {normalize, schema} = require('normalizr');
@@ -13,14 +14,12 @@ const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true};
 // SERVIDOR / ENRUTADOR
 const PORT = 8080;
 const router = require('./routes/routes');
+const {user} = require('./controller/passport');
 http.listen(PORT,() => console.log(`Servidor escuchando en el puerto ${PORT}`));
 
 // MIDDLEWARES
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use('/api',router.routerApi);
-app.use('/',router.router);
-app.use(express.static('views'));
 app.use(session({
     store: MongoStore.create({
         mongoUrl: 'mongodb+srv://fedekolo:hLpilX2lYVbZmMag@cluster0.gsxpw.mongodb.net/cluster0?retryWrites=true&w=majority',
@@ -30,9 +29,13 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.use(flash());
+app.use('/api',router.routerApi);
+app.use('/',router.router);
+app.use('/user',user);
+app.use(express.static('views'));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 
 // CONFIG HANDLEBARS
 app.engine(
