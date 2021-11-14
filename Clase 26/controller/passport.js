@@ -5,6 +5,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const Usuario = require('../models/usuarios');
 const app = express();
 const user = express.Router();
+const mongoose = require('mongoose');
 
 // CONFIG PASSPORT
 passport.use('signup', new LocalStrategy({
@@ -13,10 +14,27 @@ passport.use('signup', new LocalStrategy({
     passwordField: 'contrasena'
 },
     function (req, usuario, contrasena, done) {
+
+        // OPCION CON CLASE
         // const controllerPassport = new Controller();
         // const usuarioFiltrado = controllerPassport.obtenerUsuario(usuario);
-        const usuarioFiltrado = async () => await obtenerUsuario(usuario);
+
+        // OPCION CON FUNCION
+        // const usuarioFiltrado = async () => await obtenerUsuario(usuario);
+
+        // OPCION ACÁ
+        let usuarioFiltrado = async () => {
+            try {
+                const usuarioFiltrado = await Usuario.find({usuario: usuario});
+                const opcionRetorno = usuarioFiltrado === [] ? true : false;
+                mongoose.disconnect();
+                return opcionRetorno;
+            } catch (e) {
+                console.log(e);
+            }
+        } 
         console.log(usuarioFiltrado())
+
         if (usuarioFiltrado() === []) {
             return done(null, false, console.log('Usuario ya existe'));
         } else {
@@ -116,13 +134,13 @@ app.get('/logout', (req,res)=>{
 //     }
 // }
 
-const obtenerUsuario = async (usuario) => {
-    try {
-        let usuarioFiltrado = await Usuario.find({usuario: usuario});
-        return usuarioFiltrado;
-    } catch (e) {
-        console.log(e)
-    }
-}
+// const obtenerUsuario = async (usuario) => {
+//     try {
+//         let usuarioFiltrado = await Usuario.find({usuario: usuario});
+//         return usuarioFiltrado;
+//     } catch (e) {
+//         console.log(e)
+//     }
+// }
 
 module.exports = {user};
