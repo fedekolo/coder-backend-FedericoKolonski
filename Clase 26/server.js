@@ -10,12 +10,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true};
-
-// SERVIDOR / ENRUTADOR
-const PORT = 8080;
 const router = require('./routes/routes');
 const {user} = require('./controller/passport');
-http.listen(PORT,() => console.log(`Servidor escuchando en el puerto ${PORT}`));
 
 // MIDDLEWARES
 app.use(express.json());
@@ -30,12 +26,16 @@ app.use(session({
     saveUninitialized: false
 }));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/api',router.routerApi);
 app.use('/',router.router);
 app.use('/user',user);
 app.use(express.static('views'));
-app.use(passport.initialize());
-app.use(passport.session());
+
+// SERVIDOR / ENRUTADOR
+const PORT = 8080;
+http.listen(PORT,() => console.log(`Servidor escuchando en el puerto ${PORT}`));
 
 // CONFIG HANDLEBARS
 app.engine(

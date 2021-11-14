@@ -13,17 +13,21 @@ passport.use('signup', new LocalStrategy({
     passwordField: 'contrasena'
 },
     function (req, usuario, contrasena, done) {
-        const usuarioFiltrado = obtenerUsuario(usuario);
-        if (usuarioFiltrado != undefined) {
+        // const controllerPassport = new Controller();
+        // const usuarioFiltrado = controllerPassport.obtenerUsuario(usuario);
+        const usuarioFiltrado = async () => await obtenerUsuario(usuario);
+        console.log(usuarioFiltrado())
+        if (usuarioFiltrado() === []) {
             return done(null, false, console.log('Usuario ya existe'));
         } else {
             const nuevoUsuario = {
                 usuario,
-                correo,
+                correo: req.body.correo,
                 contrasena
             }
             try {
-                async () => await Usuario(nuevoUsuario).save()
+                const agregarUsuario = async () => await Usuario(nuevoUsuario).save();
+                agregarUsuario();
             }
             catch(e) {
                 console.log('Error en proceso:', e);
@@ -50,12 +54,11 @@ passport.use('login', new LocalStrategy({
     })
 );
 
-passport.serializeUser((user, done)=>{
-    done(null, user._id);
+passport.serializeUser((usuario, done)=>{
+    done(null, usuario);
 });
 
-passport.deserializeUser((id, done)=>{
-    let usuario = obtenerUsuarioId(usuarios, id);
+passport.deserializeUser((usuario, done)=>{
     done(null, usuario);
 });
 
@@ -76,7 +79,7 @@ user.get('/login',(req,res) => {
     res.render('login');
 });
 
-user.post('/signup', passport.authenticate('signup', 
+user.post('/signup', passport.authenticate('signup',
 { failureFlash: 'Hubo un error en los datos ingresados. Puede que el usuario ya exista.' }), 
 (req,res) => {
     res.redirect('/api/productos/agregar');
@@ -92,22 +95,33 @@ app.get('/logout', (req,res)=>{
 });
 
 // CONTROLLER PASSPORT
-const obtenerUsuario = (usuario) => {
-    const usuarioFiltrado = (async () => {
+// class Controller {
+//     constructor (bd) {
+//         this.bd = bd;
+//     }
 
-        try {
-            return await Usuario.find({usuario: usuario});
-        }
-        catch(e) {
-            console.log('Error en proceso:', e);
-        }
+//     async obtenerUsuario(usuario) {
+//         try {
+//             let usuarioFiltrado = await Usuario.find({usuario: usuario});
+//             return usuarioFiltrado === [] ? false : true;
+//             // if (usuarioFiltrado === []) {
+//             //     return false;
+//             // } else {
+//             //     return true;
+//             // }
+//         } catch (e) {
+//             console.log(e)
+//         }
+//         console.log(usuarioFiltrado)
+//     }
+// }
 
-    })();
-
-    if (usuarioFiltrado === {}) {
-        return undefined;
-    } else {
-        return;
+const obtenerUsuario = async (usuario) => {
+    try {
+        let usuarioFiltrado = await Usuario.find({usuario: usuario});
+        return usuarioFiltrado;
+    } catch (e) {
+        console.log(e)
     }
 }
 
