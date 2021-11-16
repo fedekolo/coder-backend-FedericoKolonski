@@ -33,7 +33,6 @@ passport.use('signup', new LocalStrategy({
                 console.log(e);
             }
         } 
-        console.log(usuarioFiltrado())
 
         if (usuarioFiltrado() === []) {
             return done(null, false, console.log('Usuario ya existe'));
@@ -56,14 +55,19 @@ passport.use('signup', new LocalStrategy({
 ));
 
 passport.use('login', new LocalStrategy({
-        passReqToCallback: true
+        passReqToCallback: true,
+        usernameField: 'usuario',
+        passwordField: 'contrasena'
     }, 
-    function (req, username, password, done) {
-        let usuario = obtenerUsuario(usuarios, username);
-        if (usuario == undefined) {
+    function (req, usuario, contrasena, done) {
+                
+        // OPCION CON FUNCION
+        const usuarioFiltrado = async () => await obtenerUsuario(usuario);
+
+        if (usuarioFiltrado == undefined) {
             return done(null, false, console.log(username, 'usuario no existe'));
         } else {
-            if (passwordValida(usuario, password)) {
+            if (comprobarContrasena(usuario, contrasena)) {
                 return done(null, usuario)  
             } else {
                 return done(null, false, console.log(username, 'password errónea'));
@@ -82,15 +86,10 @@ passport.deserializeUser((usuario, done)=>{
 
 // ROUTES PASSPORT
 
-app.post('/login', (req,res)=>{
-    if (req.body.usuario == "fede" && req.body.contrasena == "123"){
-        req.session.user = "fede";
-        req.session.admin = true;
-        req.session.cookie.maxAge = 60000;
+app.post('/login', passport.authenticate('login', 
+    {failureFlash: 'Hubo un error en los datos ingresados.'}),
+    (req,res) => {
         res.redirect('/api/productos/agregar');
-    } else {
-        res.send('Usuario o contraseña erroneos.');
-    }
 });
 
 user.get('/login',(req,res) => {
@@ -103,44 +102,45 @@ user.post('/signup', passport.authenticate('signup',
     res.redirect('/api/productos/agregar');
 });
 
-user.get('/signup',(req,res) => {
-    res.render('signup');
-});
-
 app.get('/logout', (req,res)=>{
     req.session.destroy();
     res.redirect('/api/productos/agregar');
 });
 
 // CONTROLLER PASSPORT
-// class Controller {
-//     constructor (bd) {
-//         this.bd = bd;
-//     }
+class Controller {
+    constructor (bd) {
+        this.bd = bd;
+    }
 
-//     async obtenerUsuario(usuario) {
-//         try {
-//             let usuarioFiltrado = await Usuario.find({usuario: usuario});
-//             return usuarioFiltrado === [] ? false : true;
-//             // if (usuarioFiltrado === []) {
-//             //     return false;
-//             // } else {
-//             //     return true;
-//             // }
-//         } catch (e) {
-//             console.log(e)
-//         }
-//         console.log(usuarioFiltrado)
-//     }
-// }
+    async obtenerUsuario(usuario) {
+        try {
+            let usuarioFiltrado = await Usuario.find({usuario: usuario});
+            return usuarioFiltrado === [] ? false : true;
+        } catch (e) {
+            console.log(e)
+        }
+        console.log(usuarioFiltrado)
+    }
+}
 
-// const obtenerUsuario = async (usuario) => {
-//     try {
-//         let usuarioFiltrado = await Usuario.find({usuario: usuario});
-//         return usuarioFiltrado;
-//     } catch (e) {
-//         console.log(e)
-//     }
-// }
+const obtenerUsuario = async (usuario) => {
+    try {
+        let usuarioFiltrado = await Usuario.find({usuario: usuario});
+        return usuarioFiltrado;
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+const comprobarContrasena = async (contrasena,usuario) => {
+    try {
+        let usuarioFiltrado = await Usuario.find({usuario: usuario});
+        let resultado = usuarioFiltrado[0].contrasena == contrasena ? true : false;
+        return resultado;
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 module.exports = {user};
