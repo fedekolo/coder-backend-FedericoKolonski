@@ -1,0 +1,17 @@
+<h1 style="text-align: center; margin-top: 20px;">Formulario de registro</h1>
+<form method="POST" action="/user/signup" style="max-width: 80%; max-height: 80%; margin: 20px auto;">
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="usuario" placeholder="Usuario" name="usuario" required>
+        <label for="usuario">Usuario</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="mail" class="form-control" id="correo" placeholder="Correo" name="correo" required>
+        <label for="correo">Correo</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="password" class="form-control" id="contrasena" placeholder="Contraseña" name="contrasena" required>
+        <label for="contrasena">Contraseña</label>
+    </div>
+    <button type="sumbit" class="btn btn-info" style=" width: 100%;">Registrarse</button>
+</form>
+<h4 style="text-align: center; margin-top: 20px;">Ya estas registrado? <a href="/user/login">Inicia sesión aquí</a></h4>
