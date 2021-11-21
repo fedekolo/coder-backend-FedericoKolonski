@@ -11,8 +11,8 @@ const usuarios = [];
 // CONFIG PASSPORT
 
 passport.use(new FacebookStrategy({
-    clientID: '1220766778410838',
-    clientSecret: '0846fc42c8599bc290b37c37678d885f',
+    clientID: process.argv[3] != undefined ? process.argv[3] : '1220766778410838',
+    clientSecret: process.argv[4] != undefined ? process.argv[4] : '0846fc42c8599bc290b37c37678d885f',
     callbackURL: `https://localhost:8443/`,
     profileFields: ['id', 'photos', 'email', 'name']
   },

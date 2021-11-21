@@ -8,6 +8,7 @@ const Producto = require('../models/productos');
 const Archivo = require('../controller/productos');
 const {usuarios} = require('../controller/passport');
 // const passport = require('passport');
+const {fork} = require('child_process');
 
 // CONFIG USERS
 const auth = (req, res, next) => {
@@ -30,7 +31,6 @@ routerApi.get('/productos/agregar', async (req,res) => {
         const bd = new Archivo(bdProductos);
         const archivo = await bd.listar();
         const sinProductos = archivo.length==0 ? true : false;
-        console.log(usuarios)
         res.render('add',{producto: archivo,sinProductos: sinProductos, admin: req.session?.admin, user: req.session?.user});
         
     } catch (err) {
@@ -118,7 +118,7 @@ router.get('/info', (req,res) => {
         argumentos: process.argv,
         sistemaOperativo: process.platform,
         versionNode: process.version,
-        usoMemoria: process.memoryUsage(),
+        usoMemoria: process.memoryUsage().heapUsed,
         pathEjecucion: process.execPath,
         processId: process.pid,
         carpeta: process.cwd()
@@ -126,49 +126,15 @@ router.get('/info', (req,res) => {
     res.json(info);
 });
 
-router.get('/random', (req,res) => {
-    let {cant} = req.params;
+router.get('/randoms', (req,res) => {
+    let {cant} = req.query;
     if (cant == undefined) {
-        cant = 100000000;
-    };
-    const numerosRandom = [];
-
-    for (let index = 0; index < cant; index++) {
-        const numeroRandom = Math.floor((Math.random() * (1000 - 1 + 1)) + 1);
-        numerosRandom.push(numeroRandom);
+        cant = '100000000';
     }
-
-    
-})
-
-// app.post('/login', (req,res)=>{
-//     if (req.body.usuario == "fede" && req.body.contrasena == "123"){
-//         req.session.user = "fede";
-//         req.session.admin = true;
-//         req.session.cookie.maxAge = 60000;
-//         res.redirect('/api/productos/agregar');
-//     } else {
-//         res.send('Usuario o contraseña erroneos.');
-//     }
-// });
-
-// router.get('/login',(req,res) => {
-//     res.render('login');
-// });
-
-// router.post('/signup', passport.authenticate('signup', 
-// { failureFlash: 'Hubo un error en los datos ingresados. Puede que el usuario ya exista.' }), 
-// (req,res) => {
-//     res.redirect('/api/productos/agregar');
-// });
-
-// router.get('/signup',(req,res) => {
-//     res.render('signup');
-// });
-
-// app.get('/logout', (req,res)=>{
-//     req.session.destroy();
-//     res.redirect('/api/productos/agregar');
-// });
+    const numerosRandom = fork('./controller/numerosRandom.js');
+    numerosRandom.send(cant);
+    numerosRandom.on('message',numero=>res.end(`${numero}`));
+    console.log('Es no bloqueante');
+});
 
 module.exports = { router, routerApi, app };

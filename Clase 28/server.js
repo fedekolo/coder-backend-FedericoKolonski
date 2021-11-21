@@ -44,22 +44,14 @@ const httpsOptions = {
 
 // SERVIDOR / ENRUTADOR
 
-process.on('request',(req,res) => {
-    let {PUERTO, FACEBOOK_CLIENTE_ID, FACEBOOK_CLIENTE_SECRETO} = req;
-    const PORT;
-    PUERTO != undefined ? PORT == PUERTO : PORT == 8443;
-    const FACEBOOK_CLIENT_ID;
-    FACEBOOK_CLIENTE_ID != undefined ? FACEBOOK_CLIENT_ID == FACEBOOK_CLIENTE_ID : FACEBOOK_CLIENT_ID == '1220766778410838';
-    const FACEBOOK_CLIENT_SECRET;
-    FACEBOOK_CLIENTE_ID != undefined ? FACEBOOK_CLIENT_SECRET == FACEBOOK_CLIENTE_SECRETO : FACEBOOK_CLIENT_SECRET == '0846fc42c8599bc290b37c37678d885f';
-    const controllerPassport = fork('./controller/passport.js');
-    controllerPassport.send('FACEBOOK_CLIENT_ID');
-    controllerPassport.send('FACEBOOK_CLIENT_SECRET');
-})
-
+const PORT = process.argv[2] != undefined ? process.argv[2] : 8443;
 const server = https.createServer(httpsOptions, app)
     .listen(PORT, () => {
         console.log('Server corriendo en ' + PORT)
+});
+
+process.on('exit',(code) => {
+    console.log(code)
 });
 
 // CONFIG HANDLEBARS
