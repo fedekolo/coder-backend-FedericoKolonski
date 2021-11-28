@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const server = require('../server'); 
+const mongoose = require('mongoose');
 
 // CONEXION CON BD FACTORY
 const bdSeleccionada = 3;
@@ -81,12 +82,11 @@ const bdConfig = (bdSeleccionada) => {
         // MONGODB
 
         const bdProductos = async () => {
-            const mongoose = require('mongoose');
+
             const conexionMongoDB = require('../bd/mongoDB/conexionDB');
             conexionMongoDB();
             const Producto = require('../bd/mongoDB/models/productos');
             const bdProductos = await Producto.find().lean();
-            // mongoose.disconnect();
             return bdProductos;
         }
 

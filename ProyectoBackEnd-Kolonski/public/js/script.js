@@ -8,6 +8,8 @@ const productos = async () => {
     .then(res => res.json())
     .catch(err => console.log(err));
 
+    console.log(productos)
+
     let html = productos.map((p) => 
         `
         <div class="card" style="width: 18rem;">
@@ -54,7 +56,7 @@ const pantallaEdit = async (id) => {
     document.getElementById('foto').value = productoEdit.foto;
     document.getElementById('precio').value = productoEdit.precio;
     document.getElementById('stock').value = productoEdit.stock;
-    document.getElementById('edit-form').setAttribute('action', `/actualizar/${productoEdit.id}`)
+    document.getElementById('edit-form').setAttribute('action', `productos/actualizar/${productoEdit.id}`)
 }
 
 const enviarEdicion = async () => {

@@ -10,14 +10,23 @@ class Productos {
         this.bd = bd;
     }
 
-    listar() {
-        return this.bd;
+    async listar() {
+        try {
+            await conexionMongoDB();
+            const productosFiltrados = await Producto.find({});
+            mongoose.disconnect();
+            return productosFiltrados==undefined ? {error: 'No hay productos'} : productosFiltrados;
+        } catch (err) {
+            console.log('Error en proceso:', err);
+        }
     }
 
     async listarId(id) {
         try {
+            await conexionMongoDB();
             const productoFiltrado = await Producto.find({id: id});
-            return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado;
+            mongoose.disconnect();
+            return productoFiltrado==undefined ? {error: 'Producto no encontrado'} : productoFiltrado[0];
         } catch (err) {
             console.log('Error en proceso:', err);
         }
@@ -30,11 +39,11 @@ class Productos {
             const productoParaAgregar = {
                 id: Math.round(Math.random() * (1000000 - 1) + 1),
                 timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-                title: productoBody.nombre,
+                nombre: productoBody.nombre,
                 descripcion: productoBody.descripcion,
                 codigo: productoBody.codigo,
-                thumbnail: productoBody.foto,
-                price: productoBody.precio,
+                foto: productoBody.foto,
+                precio: productoBody.precio,
                 stock: productoBody.stock
             };
             await Producto(productoParaAgregar).save();
@@ -45,20 +54,21 @@ class Productos {
     }
 
     async actualizar(id,productoBody) { 
-        conexionMongoDB();     
-        const productoActualizado = {
-            id: id,
-            timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
-            title: productoBody.nombre,
-            descripcion: productoBody.descripcion,
-            codigo: productoBody.codigo,
-            thumbnail: productoBody.foto,
-            price: productoBody.precio,
-            stock: productoBody.stock
-        };
 
         try {
+            conexionMongoDB();     
+            const productoActualizado = {
+                id: id,
+                timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),
+                nombre: productoBody.nombre,
+                descripcion: productoBody.descripcion,
+                codigo: productoBody.codigo,
+                foto: productoBody.foto,
+                precio: productoBody.precio,
+                stock: productoBody.stock
+            };
             await Producto.updateOne({id: id}, {$set: productoActualizado});
+            mongoose.disconnect();
             return productoActualizado;
         } catch (err) {
             console.log('Error en proceso:', err);
