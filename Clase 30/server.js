@@ -44,31 +44,21 @@ const httpsOptions = {
 };
 
 // SERVIDOR / ENRUTADOR / CLUSTER
-const tipoServidor = process.argv[2];
+const PORT = parseInt(process.argv[2] || 8080);
 
-const servidor = () => {
-    const PORT = process.argv[3];
+if (cluster.isMaster){
+    console.log(`Master PID ${process.pid} is running`);
+    cluster.fork();
+    cluster.on('exit', (worker, code, signal) => { 
+        console.log(`Worker ${worker.process.pid} died`)
+        cluster.fork();
+    });
+} else {
     const server = https.createServer(httpsOptions, app)
-        .listen(PORT, () => {
-            console.log('Server corriendo en ' + PORT)
+    .listen(PORT, () => {
+        console.log('Server corriendo en ' + PORT)
     });
     server.on('error', error=>console.log('Error en servidor', error));
-};
-
-if (tipoServidor === 'CLUSTER') {
-    console.log(`Master PID ${process.pid} is running`);
-    servidor();
-} else {
-    if (cluster.isMaster){
-        console.log(`Master PID ${process.pid} is running`);
-        cluster.fork();
-        cluster.on('exit', (worker, code, signal) => { 
-            console.log(`Worker ${worker.process.pid} died`)
-            cluster.fork();
-        });
-    } else {
-        servidor();
-    }
 };
 
 // CONFIG HANDLEBARS

@@ -1,0 +1,2 @@
+2021/11/23 21:19:00 [error] 14996#5424: *1 CreateFile() "C:\Users\fedek\OneDrive\Escritorio\nginx-1.21.4/html/favicon.ico" failed (2: The system cannot find the file specified), client: 127.0.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "http://localhost/"
+2021/11/23 22:17:30 [notice] 13056#16540: signal process started
