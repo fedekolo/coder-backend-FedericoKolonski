@@ -33,7 +33,7 @@ app.use(passport.session());
 app.use('/api',router.routerApi);
 app.use('/',router.router);
 app.use('/user',user);
-app.use(express.static('views'));
+// app.use(express.static('views'));
 
 //Para convertir en HTTPS
 const https = require('https');
@@ -44,7 +44,7 @@ const httpsOptions = {
 };
 
 // SERVIDOR / ENRUTADOR / CLUSTER
-const PORT = parseInt(process.argv[2] || 8080);
+const PORT = parseInt(process.argv[2] || 8081);
 
 if (cluster.isMaster){
     console.log(`Master PID ${process.pid} is running`);
