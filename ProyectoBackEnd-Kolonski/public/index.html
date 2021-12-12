@@ -30,7 +30,7 @@
     <div id="productos"></div>
     <div id="edit-productos">
       <h3>Editar producto</h3>
-      <form class="form-agregar" id="edit-form" method="PUT">
+      <form class="form-agregar" id="edit-form" method="POST">
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="nombre" placeholder="Nombre" name="nombre" required>
             <label for="nombre">Nombre</label>
@@ -55,7 +55,7 @@
           <input type="number" class="form-control" id="stock" placeholder="Stock" name="stock" required>
           <label for="stock">Stock</label>
         </div>
-        <button onclick="enviarEdicion()" class="btn btn-info">Editar producto</button>
+        <button type="submit" class="btn btn-info">Editar producto</button>
       </form>
     </div>
 

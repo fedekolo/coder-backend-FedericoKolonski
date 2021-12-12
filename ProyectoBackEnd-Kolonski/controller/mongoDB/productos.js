@@ -56,7 +56,7 @@ class Productos {
     async actualizar(id,productoBody) { 
 
         try {
-            conexionMongoDB();     
+            await conexionMongoDB();     
             const productoActualizado = {
                 id: id,
                 timestamp: moment().utcOffset("-03:00").format('DD/MM/YYYY h:mm:ss a'),

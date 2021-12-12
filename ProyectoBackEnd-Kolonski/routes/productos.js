@@ -186,7 +186,7 @@ router.post('/agregar', async (req,res) => {
 
 });
 
-router.put('/actualizar/:id', async (req,res) => {
+router.post('/actualizar/:id', async (req,res) => {
     if (server.isAdmin) {
         try {
             const params = req.params;

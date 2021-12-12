@@ -56,14 +56,8 @@ const pantallaEdit = async (id) => {
     document.getElementById('foto').value = productoEdit.foto;
     document.getElementById('precio').value = productoEdit.precio;
     document.getElementById('stock').value = productoEdit.stock;
-    document.getElementById('edit-form').setAttribute('action', `productos/actualizar/${productoEdit.id}`)
-}
-
-const enviarEdicion = async () => {
-    await fetch(`/productos/actualizar/${id}`,{method: 'PUT'})
-    .then(alert('Producto editado con éxito'),window.location.href ='index.html')
-    .catch(err => console.log(err));
-}
+    document.getElementById('edit-form').setAttribute('action', `productos/actualizar/${productoEdit.id}`);
+};
 
 // PANTALLA CARRITO
 const carrito = async () => {

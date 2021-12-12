@@ -11,8 +11,15 @@ class Carrito {
         this.bd = bd;
     }
 
-    listar() {
-        return this.bd;
+    async listar() {
+        try {
+            await conexionMongoDB();
+            const productosFiltrados = await ProductoCarrito.find({});
+            mongoose.disconnect();
+            return productosFiltrados==undefined ? {error: 'No hay productos'} : productosFiltrados;
+        } catch (err) {
+            console.log('Error en proceso:', err);
+        }
     }
 
     async listarId(id) {
@@ -25,9 +32,10 @@ class Carrito {
     }
 
     async agregar(id) {
-        conexionMongoDB();
         try {
+            await conexionMongoDB();
             const productoFiltrado = await Producto.find({id: id});
+            
             await ProductoCarrito(productoFiltrado).save();
             mongoose.disconnect();
         } catch (err) {
